@@ -43,6 +43,10 @@ def getRequest(url, headers = defaultHeaders):
 
 def getShows():
    xbmcplugin.setContent(int(sys.argv[1]), 'files')
+   xbmcplugin.addSortMethod(int(sys.argv[1]),xbmcplugin.SORT_METHOD_UNSORTED)
+   xbmcplugin.addSortMethod(int(sys.argv[1]),xbmcplugin.SORT_METHOD_TITLE)
+   xbmcplugin.addSortMethod(int(sys.argv[1]),xbmcplugin.SORT_METHOD_EPISODE)
+
    ilist=[]
    basehtml = getRequest('http://www.bravotv.com/now/')
    cats = re.compile('<div class="wrap imageLoading".+?href="(.+?)".+?title="(.+?)".+?lazy-src="(.+?)".+?</div',re.DOTALL).findall(basehtml)
@@ -76,11 +80,18 @@ def getShows():
        liz.setProperty('fanart_image', fanart)
        ilist.append((u, liz, True))
    xbmcplugin.addDirectoryItems(int(sys.argv[1]), ilist, len(ilist))
+   if addon.getSetting('enable_views') == 'true':
+      xbmc.executebuiltin("Container.SetViewMode(%s)" % addon.getSetting('default_view'))
    xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 
 def getEpisodes(eurl, showName):
    xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+   xbmcplugin.addSortMethod(int(sys.argv[1]),xbmcplugin.SORT_METHOD_UNSORTED)
+   xbmcplugin.addSortMethod(int(sys.argv[1]),xbmcplugin.SORT_METHOD_TITLE)
+   xbmcplugin.addSortMethod(int(sys.argv[1]),xbmcplugin.SORT_METHOD_VIDEO_YEAR)
+   xbmcplugin.addSortMethod(int(sys.argv[1]),xbmcplugin.SORT_METHOD_EPISODE)
+
    ilist=[]        
    html = getRequest(eurl)
    try:    fanart = re.compile('<img class="showBaner" src="(.+?)"',re.DOTALL).search(html).group(1)
@@ -118,6 +129,8 @@ def getEpisodes(eurl, showName):
       liz.setProperty('IsPlayable', 'true')
       ilist.append((u, liz, False))
    xbmcplugin.addDirectoryItems(int(sys.argv[1]), ilist, len(ilist))
+   if addon.getSetting('enable_views') == 'true':
+      xbmc.executebuiltin("Container.SetViewMode(%s)" % addon.getSetting('episode_view'))
    xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 
