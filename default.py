@@ -96,6 +96,7 @@ def getEpisodes(eurl, showName):
    xbmcplugin.addSortMethod(int(sys.argv[1]),xbmcplugin.SORT_METHOD_EPISODE)
    ilist=[]        
    epiHTML = getRequest(eurl)
+   (tvshow,  fanart) = re.compile('og:title" content="(.+?)".+?"og:image" content="(.+?)"',re.DOTALL).search(epiHTML).groups()
    epis = re.compile('<li class="watch__episode.+?href="(.+?)".+?</ul>',re.DOTALL).findall(epiHTML)
    for url in epis:
       url  = BRAVOBASE % url
@@ -113,10 +114,10 @@ def getEpisodes(eurl, showName):
       infoList['Episode']     = int(a['pl1$episodeNumber'])
       infoList['Season']      = int(a['pl1$seasonNumber'])
       infoList['Year']        = int(infoList['Aired'].split('-',1)[0])
-      (name, infoList['Plot'], fanart) = re.compile('og:title" content="(.+?)".+?"og:description" content="(.+?)".+?"og:image" content="(.+?)"',re.DOTALL).search(epiHTML).groups()
-      infoList['Plot'] = h.unescape(infoList['Plot'].decode('utf-8'))
-      infoList['TVShowTitle'] = name
-      infoList['Title']       = name
+      infoList['Plot'] = h.unescape(a['description'])
+      infoList['TVShowTitle'] = tvshow
+      infoList['Title']       = a['title']
+      name = a['title']
       thumb = a['defaultThumbnailUrl']
       url = purl.split('?',1)[0]
       u = '%s?url=%s&name=%s&mode=GV' % (sys.argv[0],qp(url), qp(name))
